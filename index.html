@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Song Catalog</title>
+<title>Song Catalogue</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Outfit",sans-serif;}
@@ -13,9 +13,9 @@ body{
   flex-direction:column;
   align-items:center;
   padding:40px 20px;
-  background: linear-gradient(160deg,#3b0764,#6d28d9,#7e22ce);
+  background:linear-gradient(160deg,#3b0764,#6d28d9,#7e22ce);
   background-size:400% 400%;
-  animation: aurora 15s ease-in-out infinite;
+  animation:aurora 15s ease-in-out infinite;
   color:#fff;
   opacity:0;
   transition:opacity 0.5s ease;
@@ -32,22 +32,6 @@ h1{
   text-align:center;
   text-shadow:0 0 10px rgba(0,0,0,0.2);
 }
-.back-btn{
-  align-self:flex-start;
-  margin-bottom:15px;
-  cursor:pointer;
-  font-weight:600;
-  color:#fff;
-  text-decoration:none;
-  padding:8px 16px;
-  border-radius:14px;
-  background: rgba(255,255,255,0.08);
-  transition: all 0.25s ease;
-}
-.back-btn:hover{
-  background: rgba(255,255,255,0.15);
-  transform: translateY(-2px);
-}
 .search-box{
   margin-bottom:20px;
   width:100%;
@@ -60,21 +44,20 @@ h1{
   border:none;
   outline:none;
   font-size:1rem;
-  background: rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.1);
   color:#fff;
-  transition: background 0.25s ease;
+  transition:background 0.25s ease;
 }
 .search-box input::placeholder{color:rgba(255,255,255,0.7);}
 .search-box input:focus{background:rgba(255,255,255,0.2);}
 .card{
   width:100%;
   max-width:750px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(20px);
   border-radius:20px;
   padding:25px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  box-shadow:0 12px 30px rgba(0,0,0,0.25);
 }
 table{
   width:100%;
@@ -87,7 +70,7 @@ th,td{
 }
 th{
   font-weight:700;
-  background: rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.1);
 }
 a.youtube-link{
   color:#60a5fa;
@@ -107,145 +90,130 @@ a.youtube-link:hover{
   cursor:pointer;
   padding:8px 18px;
   border-radius:14px;
-  background: rgba(255, 255, 255, 0.2);
+  background:rgba(255, 255, 255, 0.2);
   color:#fff;
   font-weight:600;
   border:1px solid rgba(255,255,255,0.3);
   box-shadow:0 0 10px rgba(255,255,255,0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.25s ease;
+  backdrop-filter:blur(10px);
+  transition:all 0.25s ease;
 }
 .page-btn:hover{
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: 0 0 15px rgba(255,255,255,0.3);
-  transform: scale(1.05);
+  background:rgba(255, 255, 255, 0.35);
+  box-shadow:0 0 15px rgba(255,255,255,0.3);
+  transform:scale(1.05);
 }
 .page-btn:disabled{
   opacity:0.4;
   cursor:not-allowed;
-  background: rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.1);
   box-shadow:none;
-}
-footer{
-  margin-top:35px;
-  color:rgba(255,255,255,0.6);
-  font-size:0.85rem;
-  text-align:center;
-}
-@media(max-width:600px){
-  th,td{padding:12px 8px;font-size:0.85rem;}
-  h1{font-size:1.7rem;}
 }
 </style>
 </head>
 <body>
-
-<h1>🎵 Song Catalog</h1>
-<a href="index.html" class="back-btn">Back to Menu</a>
+<h1>Song Catalogue</h1>
 
 <div class="search-box">
-  <input type="text" id="searchInput" placeholder="Cari lagu, penyanyi, atau composer...">
+  <input type="text" id="search" placeholder="Cari lagu, penyanyi, atau composer...">
 </div>
 
 <div class="card">
-  <table>
+  <table id="songTable">
     <thead>
       <tr>
         <th>No</th>
         <th>Title</th>
         <th>Singer</th>
         <th>Composer</th>
-        <th>YouTube Link</th>
+        <th>YouTube</th>
       </tr>
     </thead>
-    <tbody id="table-body"></tbody>
+    <tbody></tbody>
   </table>
-
-  <div class="pagination">
-    <button class="page-btn" id="prevBtn">Prev</button>
-    <button class="page-btn" id="nextBtn">Next</button>
-  </div>
 </div>
 
-<footer>© 2025 Dynotic ID</footer>
+<div class="pagination">
+  <button id="prevPage" class="page-btn">Prev</button>
+  <span id="pageInfo"></span>
+  <button id="nextPage" class="page-btn">Next</button>
+</div>
 
 <script>
-let songs = [];
-let filteredSongs = [];
-let currentPage = 1;
-const rowsPerPage = 5;
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("loaded");
 
-// 🔹 Ambil data dari catalogue.json
-async function loadSongs() {
-  try {
+  let songs = [];
+  let filteredSongs = [];
+  let currentPage = 1;
+  const rowsPerPage = 50; // tampilkan 50 lagu per halaman
+
+  async function loadSongs() {
     const res = await fetch("catalogue.json");
     const data = await res.json();
+    songs = data.slice(1); // lewati header baris pertama
+    filteredSongs = songs;
+    renderTable();
+  }
 
-    // 🔹 Cek format A–E atau title–singer–composer
-    songs = data.map(song => {
-      return {
-        no: song.no || song.A || "",        // kolom nomor
-        title: song.title || song.B || "",
-        singer: song.singer || song.C || "",
-        composer: song.composer || song.D || "",
-        youtube: song.youtube || song["YouTube link"] || song.E || ""
-      };
+  function renderTable() {
+    const tableBody = document.querySelector("#songTable tbody");
+    tableBody.innerHTML = "";
+
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    const paginated = filteredSongs.slice(start, end);
+
+    paginated.forEach(song => {
+      const youtubeLink = song.E && song.E.trim() !== "" 
+        ? `<a href="${song.E}" target="_blank" class="youtube-link">Open</a>` 
+        : "-";
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${song.A}</td>
+        <td>${song.B}</td>
+        <td>${song.C}</td>
+        <td>${song.D}</td>
+        <td>${youtubeLink}</td>
+      `;
+      tableBody.appendChild(tr);
     });
 
-    filteredSongs = [...songs];
-    renderTable();
-  } catch (error) {
-    console.error("Gagal memuat JSON:", error);
+    const totalPages = Math.ceil(filteredSongs.length / rowsPerPage);
+    document.getElementById("pageInfo").textContent = `Page ${currentPage} / ${totalPages}`;
+    document.getElementById("prevPage").disabled = currentPage === 1;
+    document.getElementById("nextPage").disabled = currentPage === totalPages;
   }
-}
 
-function renderTable(){
-  const tableBody = document.getElementById("table-body");
-  tableBody.innerHTML = "";
-
-  const start = (currentPage-1)*rowsPerPage;
-  const end = start+rowsPerPage;
-  const pageSongs = filteredSongs.slice(start,end);
-
-  pageSongs.forEach(song=>{
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${song.no || "-"}</td>
-      <td>${song.title || "-"}</td>
-      <td>${song.singer || "-"}</td>
-      <td>${song.composer || "-"}</td>
-      <td><a href="${song.youtube}" class="youtube-link" target="_blank">Open</a></td>
-    `;
-    tableBody.appendChild(row);
+  document.getElementById("search").addEventListener("input", (e) => {
+    const term = e.target.value.toLowerCase();
+    filteredSongs = songs.filter(song =>
+      song.B.toLowerCase().includes(term) ||
+      song.C.toLowerCase().includes(term) ||
+      song.D.toLowerCase().includes(term)
+    );
+    currentPage = 1;
+    renderTable();
   });
 
-  document.getElementById("prevBtn").disabled = currentPage===1;
-  document.getElementById("nextBtn").disabled = end>=filteredSongs.length;
-}
+  document.getElementById("prevPage").addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  });
 
-document.getElementById("prevBtn").addEventListener("click",()=>{
-  if(currentPage>1){currentPage--;renderTable();}
-});
-document.getElementById("nextBtn").addEventListener("click",()=>{
-  if(currentPage*rowsPerPage<filteredSongs.length){currentPage++;renderTable();}
-});
-document.getElementById("searchInput").addEventListener("input",(e)=>{
-  const keyword = e.target.value.toLowerCase();
-  filteredSongs = songs.filter(song=>
-    song.title.toLowerCase().includes(keyword) ||
-    song.singer.toLowerCase().includes(keyword) ||
-    song.composer.toLowerCase().includes(keyword)
-  );
-  currentPage=1;
-  renderTable();
-});
+  document.getElementById("nextPage").addEventListener("click", () => {
+    const totalPages = Math.ceil(filteredSongs.length / rowsPerPage);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+    }
+  });
 
-window.addEventListener("load",()=>{
-  document.body.classList.add("loaded");
-  loadSongs(); // ⬅️ Ambil dari catalogue.json
+  loadSongs();
 });
 </script>
-
 </body>
 </html>
