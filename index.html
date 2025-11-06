@@ -97,8 +97,6 @@ a.youtube-link{
 a.youtube-link:hover{
   text-decoration:underline;
 }
-
-/* 🔹 Pagination */
 .pagination{
   margin-top:20px;
   display:flex;
@@ -177,17 +175,28 @@ let filteredSongs = [];
 let currentPage = 1;
 const rowsPerPage = 5;
 
-// Ambil data langsung dari file catalogue.json
-fetch("catalogue.json")
-  .then(response => response.json())
-  .then(data => {
-    songs = data;
+// 🔹 Fungsi untuk load JSON dari file
+async function loadSongs() {
+  try {
+    const res = await fetch("songs.json");
+    const data = await res.json();
+
+    // 🔹 Cek apakah format pakai A–E atau title–singer–composer
+    songs = data.map(song => {
+      return {
+        title: song.title || song.B || "",
+        singer: song.singer || song.C || "",
+        composer: song.composer || song.D || "",
+        youtube: song.youtube || song["YouTube link"] || song.E || ""
+      };
+    });
+
     filteredSongs = [...songs];
     renderTable();
-  })
-  .catch(err => {
-    console.error("Gagal memuat catalogue.json:", err);
-  });
+  } catch (error) {
+    console.error("Gagal memuat JSON:", error);
+  }
+}
 
 function renderTable(){
   const tableBody = document.getElementById("table-body");
@@ -200,9 +209,9 @@ function renderTable(){
   pageSongs.forEach(song=>{
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${song.title}</td>
-      <td>${song.singer}</td>
-      <td>${song.composer}</td>
+      <td>${song.title || "-"}</td>
+      <td>${song.singer || "-"}</td>
+      <td>${song.composer || "-"}</td>
       <td><a href="${song.youtube}" class="youtube-link" target="_blank">Open</a></td>
     `;
     tableBody.appendChild(row);
@@ -231,6 +240,7 @@ document.getElementById("searchInput").addEventListener("input",(e)=>{
 
 window.addEventListener("load",()=>{
   document.body.classList.add("loaded");
+  loadSongs(); // ⬅️ Panggil fungsi load JSON
 });
 </script>
 
