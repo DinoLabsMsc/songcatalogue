@@ -152,6 +152,7 @@ footer{
   <table>
     <thead>
       <tr>
+        <th>No</th>
         <th>Title</th>
         <th>Singer</th>
         <th>Composer</th>
@@ -175,15 +176,16 @@ let filteredSongs = [];
 let currentPage = 1;
 const rowsPerPage = 5;
 
-// 🔹 Fungsi untuk load JSON dari file
+// 🔹 Ambil data dari catalogue.json
 async function loadSongs() {
   try {
-    const res = await fetch("songs.json");
+    const res = await fetch("catalogue.json");
     const data = await res.json();
 
-    // 🔹 Cek apakah format pakai A–E atau title–singer–composer
+    // 🔹 Cek format A–E atau title–singer–composer
     songs = data.map(song => {
       return {
+        no: song.no || song.A || "",        // kolom nomor
         title: song.title || song.B || "",
         singer: song.singer || song.C || "",
         composer: song.composer || song.D || "",
@@ -209,6 +211,7 @@ function renderTable(){
   pageSongs.forEach(song=>{
     const row = document.createElement("tr");
     row.innerHTML = `
+      <td>${song.no || "-"}</td>
       <td>${song.title || "-"}</td>
       <td>${song.singer || "-"}</td>
       <td>${song.composer || "-"}</td>
@@ -240,7 +243,7 @@ document.getElementById("searchInput").addEventListener("input",(e)=>{
 
 window.addEventListener("load",()=>{
   document.body.classList.add("loaded");
-  loadSongs(); // ⬅️ Panggil fungsi load JSON
+  loadSongs(); // ⬅️ Ambil dari catalogue.json
 });
 </script>
 
